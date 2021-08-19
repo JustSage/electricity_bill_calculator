@@ -1,7 +1,7 @@
 import concurrent.futures
 from concurrent.futures import Future
 from bs4 import BeautifulSoup as bs
-from utils.utils import get_previous_watt_count,construct_bill,write_bill
+from utils.utils import get_previous_watt_count,construct_bill, add_bill
 
 import requests
 
@@ -37,4 +37,4 @@ def calculate_my_electric_bill():
     to_pay = calculate_bill(curr_watt_count, prev_month_watt_count, watt_rate.result())
     bill = construct_bill(curr_watt_count, to_pay)
     print(f"Upcoming bill: {bill['to_pay']:.2f} ILS")
-    write_bill(bill)
+    add_bill(bill)
