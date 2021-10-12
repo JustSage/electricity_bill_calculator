@@ -17,24 +17,28 @@ def calculate_my_electric_bill():
         return concurrent.futures.ThreadPoolExecutor().submit(worker, t_url)
 
     def calculate_bill(curr_month: float, prev_month: float, watt_rate: float) -> float:
-        print("Calculating Electricity Bill...")
-        if prev_month:
-            result = curr_month * (watt_rate / 100)
         to_calc = curr_month - prev_month
         result = to_calc * (watt_rate / 100)
         return round(result, 2)
 
+
+    prev_month_watt_count = get_previous_watt_count()
     # Calculating rates
     while True:
         try:
             curr_watt_count = float(input("Insert the WATT amount displayed on the electricity counter: "))
-            break
+            if prev_month_watt_count >= curr_watt_count:
+                print("Watt count can't be equal or lower than previous count")
+            else:
+                print("Calculating Electricity Bill...")
+                break
+            
         except ValueError:
             print("Invalid input") 
 
-    prev_month_watt_count = get_previous_watt_count()
     watt_rate = get_elec_rate(URL)
     to_pay = calculate_bill(curr_watt_count, prev_month_watt_count, watt_rate.result())
     bill = construct_bill(curr_watt_count, to_pay)
-    print(f"Upcoming bill: {bill['to_pay']:.2f} ILS")
-    add_bill(bill)
+    bill_added = add_bill(bill)
+    if bill_added:
+        print(f"Upcoming bill: {bill['to_pay']:.2f} ILS")

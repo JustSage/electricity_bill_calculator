@@ -1,2 +1,3 @@
 __pycache__
 .DS_Store
+./src/utils/data/elec_bills.json
