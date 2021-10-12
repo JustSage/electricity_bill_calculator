@@ -5,7 +5,7 @@ from typing import List,Dict
 
 PATH = os.path.dirname(os.path.realpath(__file__)) + "/data/elec_bills.json"
 
-def clean_function_name(name:function) -> str:
+def clean_function_name(name) -> str:
     """
     @param name: the name of the function to clean.
     @return a cleaned version of the function name.
@@ -37,8 +37,8 @@ def construct_bill(watts: float, to_pay: float) -> Dict:
     with given params.
     """
     bill = {}
-    bill['to_pay'] = to_pay
     bill['watts'] = watts
+    bill['to_pay'] = to_pay
     bill['date'] = datetime.today().date().strftime("%-d-%B-%Y")
     return bill
 
@@ -67,7 +67,7 @@ def init_bill_data(bill:Dict) -> None:
     with open(PATH, "w") as file:
         file.write(json.dumps(data))
 
-def add_bill(bill:Dict) -> None:
+def add_bill(bill:Dict) -> bool:
     """
     @param bill: a bill dictionary to add.
     if the file is not empty, the function appends a bill dictionary to a json file;
@@ -76,7 +76,7 @@ def add_bill(bill:Dict) -> None:
     """
     if file_is_empty():
         init_bill_data(bill)
-        return
+        return True
 
     with open(PATH, "r+") as file:
         data = json.load(file)
@@ -85,6 +85,21 @@ def add_bill(bill:Dict) -> None:
             data['bills'].append(bill)
             file.seek(0)
             json.dump(data, file)
+            return True
         else: # the date exists within the list of dictionaries
             print("Bill already exists... Aborting bill insertion...")
-            return
+            return False
+
+def list_previous_bills():
+    if file_is_empty():
+        print("There are no bills to display")
+    else:
+        with open(PATH, "r") as file:
+            data = json.load(file)
+            for item in data['bills']:
+                print("Bill of " + item['date'])
+                for k,v in item.items():
+                    if k != 'date':
+                        k = " ".join(k.split("_")).title()
+                        print(k,":",v)
+                print()
